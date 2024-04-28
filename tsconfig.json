@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "module":"esnext",
+    "lib": ["ESNext"],
+    "outDir": "lib",
+    "moduleResolution": "Node",
+    "strict": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true
+  }
+}

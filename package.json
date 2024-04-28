@@ -1,0 +1,47 @@
+{
+  "name": "swagger-transform",
+  "version": "1.0.0",
+  "description": "通过swagger生成ts类型及api",
+  "author": "tolking <qw13131wang@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/index.cjs",
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "rollup -c rollup.config.js -w",
+    "build": "rollup -c rollup.config.js",
+    "test": "node test/index.js",
+    "lint": "eslint . --fix --ext .ts,.js --ignore-pattern \"/lib/\"",
+    "prettier": "prettier --write \"src/*.ts\" --ignore-unknown",
+    "prepare": "husky install"
+  },
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tolking/swagger-to-api.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tolking/swagger-to-api/issues"
+  },
+  "homepage": "https://github.com/tolking/swagger-to-api#readme",
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.1.1",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "rollup": "^4.17.0",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "typescript": "^5.4.5"
+  }
+}
