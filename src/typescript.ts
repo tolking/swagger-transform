@@ -1,4 +1,5 @@
 import { config } from "./config";
+import { definitionsToType } from "./definitions";
 import { read } from "./read";
 import type { Config } from "./types";
 
@@ -10,4 +11,5 @@ export async function swaggerToType(option: Config) {
 
   let content = await read(_config.entry);
   if (!content) return;
+  definitionsToType(content, _config);
 }

@@ -3,6 +3,7 @@ export interface Config {
   api?: boolean
   outDir?: string
   apiOutDir?: string
+  typeMap?: Record<string, string>
   reParametersName?: (
     type: Extract<SwaggerParameter['in'], 'path' | 'query'> | 'body',
     path: string,
@@ -16,10 +17,14 @@ export interface Config {
 
 /** Swagger */
 export interface Swagger {
-  swagger: string
+  swagger: string // 2.x
+  openapi: string // 3.x
   info: SwaggerInfo
   paths: SwaggerPaths
-  definitions: SwaggerDefinitions
+  definitions: SwaggerDefinitions // 2.x
+  components: {
+    schemas: SwaggerDefinitions
+  } // 3.x
 }
 
 export interface SwaggerInfo {
@@ -80,8 +85,9 @@ export interface SwaggerSchemaDefault {
 }
 
 export interface SwaggerSchemaRef {
-  type?: undefined
   $ref?: string
+  type?: undefined
+  description?: undefined
 }
 
 export interface SwaggerSchemaArray {
@@ -96,13 +102,13 @@ export interface SwaggerSchemaObject {
   type: 'object'
   properties: Record<string, SwaggerSchema>
   required?: string[]
+  description?: undefined
 }
 
 export interface SwaggerSchemaEnum {
-  enum: Array<string | string>[]
+  enum: Array<string | number>
   type?: 'string' | 'integer'
   description?: string
-  allOf?: SwaggerSchema[]
   'x-enum-comments'?: Record<string, string>
   'x-enum-varnames'?: string[]
 }
@@ -113,7 +119,8 @@ export interface SwaggerResponse {
 
 export interface SwaggerResponseContent {
   description: string
-  schema: SwaggerSchema
+  schema: SwaggerSchema // 2.x
+  content: Record<string, { schema: SwaggerSchema }> // 3.x
 }
 
 export interface SwaggerDefinitions {

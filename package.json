@@ -1,7 +1,7 @@
 {
   "name": "swagger-transform",
   "version": "1.0.0",
-  "description": "通过swagger生成ts类型及api",
+  "description": "A tool to generate API clients from Swagger/OpenAPI specs.",
   "author": "tolking <qw13131wang@gmail.com>",
   "license": "MIT",
   "type": "module",
@@ -37,12 +37,13 @@
     "node": ">=16.0.0"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
     "@types/node": "^20.12.7",
     "eslint": "^9.1.1",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
     "rollup": "^4.17.0",
-    "rollup-plugin-typescript2": "^0.36.0",
+    "tslib": "^2.6.2",
     "typescript": "^5.4.5"
   }
 }

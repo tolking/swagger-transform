@@ -1,10 +1,9 @@
-import ts from 'rollup-plugin-typescript2'
+import typescript from '@rollup/plugin-typescript'
 
 const commonConf = {
   input: './src/index.ts',
   plugins: [
-    ts({
-      extensions: ['.ts'],
+    typescript({
       tsconfig: './tsconfig.json',
     }),
   ],
