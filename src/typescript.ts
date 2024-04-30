@@ -1,15 +1,17 @@
-import { config } from "./config";
+import { defaultConfig } from "./config";
 import { definitionsToType } from "./definitions";
+import { pathsToApis } from "./paths";
 import { read } from "./read";
 import type { Config } from "./types";
 
 export async function swaggerToType(option: Config) {
-  const _config = Object.assign(config, option);
-  if (!_config.entry) {
+  const config = Object.assign({}, defaultConfig, option);
+  if (!config.entry) {
     throw new Error("[swagger-transform Error]: entry is required");
   }
 
-  let content = await read(_config.entry);
+  let content = await read(config.entry);
   if (!content) return;
-  definitionsToType(content, _config);
+  definitionsToType(content, config);
+  config.api && pathsToApis(content, config);
 }

@@ -1,9 +1,9 @@
 import { write } from "./write";
-import { capitalize, genTypeImport, getLastPath, isNumber, transformType, uncapitalize } from "./utils";
+import { capitalize, genTypeImport, getRefTypeName, isNumber, transformType, uncapitalize } from "./utils";
 import type { Config, Swagger, SwaggerSchemaArray, SwaggerSchemaEnum, SwaggerSchemaObject } from "./types";
 
 export function definitionsToType(content: Swagger, config: Config) {
-  const definitions = content.components.schemas || content.definitions;
+  const definitions = content?.components?.schemas || content?.definitions || {};
 
   for (const key in definitions) {
     const item = definitions[key];
@@ -89,11 +89,6 @@ function genInterfaceProp(key: string, value: string, required: string[] | undef
   return `${description ? `\n  /** ${description} */` : ''}\n  ${key}${isRequired}: ${transformType(value, config)}`;
 }
 
-function getRefTypeName(ref: string, config: Config) {
-  const key = getLastPath(ref);
-  return config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key);
-}
-
 function genEnum(typeName: string, definition: SwaggerSchemaEnum) {
   if ('x-enum-varnames' in definition && definition['x-enum-varnames']?.length) {
     const data = definition["x-enum-varnames"].reduce((all, item, index) => {
@@ -103,11 +98,11 @@ function genEnum(typeName: string, definition: SwaggerSchemaEnum) {
       all += `${description ? `\n  /** ${description} */` : ''}\n  ${item} = ${isNumber(value) ? value : `'${value}'`},`
 
       return all
-    }, '')
+    }, '');
 
     return `export enum ${typeName} {${data}
 }
-`
+`;
   } else {
     return `export type ${typeName} = ${definition.enum.map((item) => `'${item}'`).join(' | ')}`;
   }

@@ -1,8 +1,13 @@
 export interface Config {
   entry: string
-  api?: boolean
   outDir?: string
-  apiOutDir?: string
+  api?: {
+    fileName?: string
+    exportName?: string
+    typeName?: string
+    typeFileName?: string
+    outDir?: string
+  },
   typeMap?: Record<string, string>
   reParametersName?: (
     type: Extract<SwaggerParameter['in'], 'path' | 'query'> | 'body',
@@ -21,8 +26,8 @@ export interface Swagger {
   openapi: string // 3.x
   info: SwaggerInfo
   paths: SwaggerPaths
-  definitions: SwaggerDefinitions // 2.x
-  components: {
+  definitions?: SwaggerDefinitions // 2.x
+  components?: {
     schemas: SwaggerDefinitions
   } // 3.x
 }
@@ -114,13 +119,13 @@ export interface SwaggerSchemaEnum {
 }
 
 export interface SwaggerResponse {
-  [key: `"${number}"`]: SwaggerResponseContent
+  [key: string]: SwaggerResponseContent
 }
 
 export interface SwaggerResponseContent {
   description: string
-  schema: SwaggerSchema // 2.x
-  content: Record<string, { schema: SwaggerSchema }> // 3.x
+  schema?: SwaggerSchema // 2.x
+  content?: Record<string, { schema: SwaggerSchema }> // 3.x
 }
 
 export interface SwaggerDefinitions {

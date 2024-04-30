@@ -1,3 +1,4 @@
+import { defaultTypeMap } from "./config";
 import type { Config } from "./types";
 
 /**
@@ -46,7 +47,18 @@ export function getLastPath(path: string): string {
  * @param type string
  */
 export function transformType(type: string, config: Config): string {
-  return config.typeMap?.[type] || type;
+  const typeMap = Object.assign({}, defaultTypeMap, config.typeMap);
+  return typeMap[type] || type;
+}
+
+/**
+ * Get the name of the reference type
+ * @param ref string
+ * @param config Config
+ */
+export function getRefTypeName(ref: string, config: Config) {
+  const key = getLastPath(ref);
+  return config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key);
 }
 
 /**
