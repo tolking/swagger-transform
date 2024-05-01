@@ -8,12 +8,12 @@ export async function read(path: string) {
   return isUrl ? await getContentFromUrl(path) : getContentFromPath(path)
 }
 
-function getContentFromPath(path: string) {
+export function getContentFromPath(path: string) {
   const content = readFileSync(resolve(path), 'utf-8')
   return JSON.parse(content) as Swagger
 }
 
-async function getContentFromUrl(url: string) {
+export async function getContentFromUrl(url: string) {
   return fetch(url)
   .then(response => response.json())
   .then(data => data as Swagger)

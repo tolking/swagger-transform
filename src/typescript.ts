@@ -12,6 +12,6 @@ export async function swaggerToType(option: Config) {
 
   const content = await read(config.entry)
   if (!content) return
-  definitionsToType(content, config)
   config.api && pathsToApis(content, config)
+  definitionsToType(content, config)
 }

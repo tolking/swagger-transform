@@ -10,10 +10,8 @@ export interface Config {
   },
   typeMap?: Record<string, string>
   reParametersName?: (
-    type: Extract<SwaggerParameter['in'], 'path' | 'query'> | 'body',
-    path: string,
-    method: string,
-    operation: SwaggerOperation,
+    key: string,
+    type: Exclude<SwaggerParameter['in'], 'formData'>,
     content: Swagger,
   ) => string,
   reDefinitionName?: (name: string) => string,
@@ -53,6 +51,7 @@ export interface SwaggerOperation {
   consumes?: string[]
   produces?: string[]
   parameters?: Array<SwaggerParameter | SwaggerParameterBody>
+  requestBody?: { content?: Record<string, { schema: SwaggerSchema }> } // 3.x
   responses: SwaggerResponse
   schemes?: string[]
   deprecated?: boolean
@@ -70,6 +69,7 @@ export interface SwaggerParameter {
   items?: SwaggerSchemaRef | SwaggerSchemaArray // only for type: 'array'
   collectionFormat?: 'csv' | 'ssv' | 'tsv' | 'pipes' | 'multi'
   enum?: string[]
+  schema?: SwaggerSchema
 }
 
 export interface SwaggerParameterBody {

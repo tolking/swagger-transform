@@ -1,5 +1,5 @@
 import { defaultTypeMap } from './config'
-import type { Config } from './types'
+import type { Config, Swagger, SwaggerParameter } from './types'
 
 /**
  * Check the value is number
@@ -52,6 +52,14 @@ export function transformType(type: string, config: Config): string {
 }
 
 /**
+ * transform type name
+ * @param name string
+ */
+export function transformKeyName(name: string) {
+  return /^[a-zA-Z0-9]*$/.test(name) ? name : `'${name}'`
+}
+
+/**
  * Get the name of the reference type
  * @param ref string
  * @param config Config
@@ -59,6 +67,24 @@ export function transformType(type: string, config: Config): string {
 export function getRefTypeName(ref: string, config: Config) {
   const key = getLastPath(ref)
   return config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
+}
+
+/**
+ * Get the name of the parameter
+ * @param key 
+ * @param type 
+ * @param content 
+ * @param config 
+ */
+export function getParametersName(key: string, type: Exclude<SwaggerParameter['in'], 'formData'>, content: Swagger, config: Config) {
+  let name = config.reParametersName ? config.reParametersName(key, 'header', content) : `${capitalize(key)}${capitalize(type)}`
+  let n = 0
+
+  while (content.definitions && name in content.definitions) {
+    name = `${name}${n++}`
+  }
+
+  return name
 }
 
 /**
