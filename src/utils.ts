@@ -1,11 +1,11 @@
-import { defaultTypeMap } from "./config";
-import type { Config } from "./types";
+import { defaultTypeMap } from './config'
+import type { Config } from './types'
 
 /**
  * Check the value is number
  * @param value any
  */
-export function isNumber(value: any): value is number {
+export function isNumber(value: unknown): value is number {
   return typeof value === 'number'
 }
 
@@ -22,7 +22,7 @@ export function isURL(url: string): boolean {
  * @param str string
  */
 export function capitalize<T extends string>(str: T) {
-  return str.replace(/^\w/, (c) => c.toUpperCase()) as Capitalize<T>;
+  return str.replace(/^\w/, (c) => c.toUpperCase()) as Capitalize<T>
 }
 
 /**
@@ -30,7 +30,7 @@ export function capitalize<T extends string>(str: T) {
  * @param str string
  */
 export function uncapitalize<T extends string>(str: T) {
-  return str.replace(/^\w/, (c) => c.toLowerCase()) as Uncapitalize<T>;
+  return str.replace(/^\w/, (c) => c.toLowerCase()) as Uncapitalize<T>
 }
 
 /** 
@@ -38,8 +38,8 @@ export function uncapitalize<T extends string>(str: T) {
  * @param path string
  */
 export function getLastPath(path: string): string {
-  const math = path.match(/\/([^/]*)$/);
-  return math?.[1] || path;
+  const math = path.match(/\/([^/]*)$/)
+  return math?.[1] || path
 }
 
 /**
@@ -47,8 +47,8 @@ export function getLastPath(path: string): string {
  * @param type string
  */
 export function transformType(type: string, config: Config): string {
-  const typeMap = Object.assign({}, defaultTypeMap, config.typeMap);
-  return typeMap[type] || type;
+  const typeMap = Object.assign({}, defaultTypeMap, config.typeMap)
+  return typeMap[type] || type
 }
 
 /**
@@ -57,8 +57,8 @@ export function transformType(type: string, config: Config): string {
  * @param config Config
  */
 export function getRefTypeName(ref: string, config: Config) {
-  const key = getLastPath(ref);
-  return config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key);
+  const key = getLastPath(ref)
+  return config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
 }
 
 /**
@@ -67,9 +67,9 @@ export function getRefTypeName(ref: string, config: Config) {
  * @param config Config
  */
 export function genTypeImport(key: string, config: Config): string {
-  if (!key) return '';
-  const fileName = config.reDefinitionFileName ? config.reDefinitionFileName(key) : uncapitalize(key);
-  const typeName = config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key);
+  if (!key) return ''
+  const fileName = config.reDefinitionFileName ? config.reDefinitionFileName(key) : uncapitalize(key)
+  const typeName = config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
 
   return `import type { ${typeName} } from './${fileName}'\n`
 }

@@ -1,7 +1,7 @@
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
-import { isURL } from "./utils";
-import type { Swagger } from "./types";
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { isURL } from './utils'
+import type { Swagger } from './types'
 
 export async function read(path: string) {
   const isUrl = isURL(path)
@@ -9,8 +9,8 @@ export async function read(path: string) {
 }
 
 function getContentFromPath(path: string) {
-  const content = readFileSync(resolve(path), "utf-8");
-  return JSON.parse(content) as Swagger;
+  const content = readFileSync(resolve(path), 'utf-8')
+  return JSON.parse(content) as Swagger
 }
 
 async function getContentFromUrl(url: string) {
@@ -18,6 +18,6 @@ async function getContentFromUrl(url: string) {
   .then(response => response.json())
   .then(data => data as Swagger)
   .catch((err) => {
-    throw new Error(`[swagger-transform Error]: ${err}`);
-  });
+    throw new Error(`[swagger-transform Error]: ${err}`)
+  })
 }

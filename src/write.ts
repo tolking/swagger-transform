@@ -6,7 +6,7 @@ export function write(outDir: string, name: string, data: string) {
 
   mkdir(resolve(outDir), { recursive: true }, () => {
     writeFile(path, data, (err) => {
-      if (err) throw new Error(`[swagger-transform Error]: ${err}`);
+      if (err) throw new Error(`[swagger-transform Error]: ${err}`)
     })
   })
 }
