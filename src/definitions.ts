@@ -1,15 +1,36 @@
+import { defaultApi } from './config'
 import { write } from './write'
-import { capitalize, genTypeImport, getRefTypeName, isNumber, transformKeyName, transformType, uncapitalize } from './utils'
-import type { Config, Swagger, SwaggerSchema, SwaggerSchemaArray, SwaggerSchemaEnum, SwaggerSchemaObject } from './types'
+import {
+  capitalize,
+  genDescription,
+  genTypeExport,
+  genTypeImport,
+  getRefTypeName,
+  isNumber,
+  transformKeyName,
+  transformType,
+  uncapitalize,
+} from './utils'
+import type {
+  Config,
+  Swagger,
+  SwaggerSchema,
+  SwaggerSchemaArray,
+  SwaggerSchemaEnum,
+  SwaggerSchemaObject,
+} from './types'
 
 export function definitionsToType(content: Swagger, config: Config) {
   const definitions = Object.assign({}, content?.components?.schemas, content?.definitions)
+  const description = genDescription(config.description, '', '\n\n')
+  const fileList: string[] = []
 
   for (const key in definitions) {
     const item = definitions[key]
     const fileName = config.reDefinitionFileName ? config.reDefinitionFileName(key) : uncapitalize(key)
     const typeName = config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
 
+    fileList.push(fileName)
     if ('properties' in item) {
       const [importTypes, properties] = genInterface(item, config)
       let imports = ''
@@ -20,7 +41,7 @@ export function definitionsToType(content: Swagger, config: Config) {
         })
       }
 
-      const data = `${imports ? `${imports}\n` : ''}export interface ${typeName} {${properties}
+      const data = `${description}${imports ? `${imports}\n` : ''}export interface ${typeName} {${properties}
 }
 `
 
@@ -28,8 +49,18 @@ export function definitionsToType(content: Swagger, config: Config) {
     } else if ('enum' in item) {
       const data = genEnum(typeName, item)
 
-      write(config.outDir!, `${fileName}.ts`, data)
+      write(config.outDir!, `${fileName}.ts`, `${description}${data}`)
     }
+  }
+
+  if (config.index) {
+    const apiConfig = Object.assign({}, defaultApi, config.api)
+    const data = fileList.reduce((all, item) => {
+      all += genTypeExport(item)
+      return all
+    }, `${description}${apiConfig.typeFileName ? genTypeExport(apiConfig.typeFileName) : ''}`)
+
+    write(config.outDir!, 'index.ts', data)
   }
 }
 
@@ -100,9 +131,15 @@ export function genSchema(schema: SwaggerSchema, config: Config): [Set<string>, 
   return [importTypes, undefined]
 }
 
-export function genInterfaceProp(key: string, value: string, required: string[] | undefined, description: string | undefined, config: Config) {
-  const isRequired = required && required.includes(key)
-  return `${description ? `\n  /** ${description} */` : ''}\n  ${transformKeyName(key)}${isRequired ? '' : '?'}: ${transformType(value, config)}`
+export function genInterfaceProp(
+  key: string,
+  value: string,
+  required: string[] | undefined,
+  description: string | undefined,
+  config: Config,
+) {
+  const requiredText = required && required.includes(key) ? '' : '?'
+  return `${genDescription(description)}\n  ${transformKeyName(key)}${requiredText}: ${transformType(value, config)}`
 }
 
 export function genEnum(typeName: string, definition: SwaggerSchemaEnum) {
@@ -111,7 +148,7 @@ export function genEnum(typeName: string, definition: SwaggerSchemaEnum) {
       const description = definition['x-enum-comments']?.[item] || undefined
       const value = definition.enum[index]
 
-      all += `${description ? `\n  /** ${description} */` : ''}\n  ${item} = ${isNumber(value) ? value : `'${value}'`},`
+      all += `${genDescription(description)}\n  ${item} = ${isNumber(value) ? value : `'${value}'`},`
 
       return all
     }, '')

@@ -1,15 +1,31 @@
 import { defaultApi } from './config'
 import { genSchema } from './definitions'
 import { write } from './write'
-import { capitalize, genTypeImport, getLastPath, getParametersName, transformKeyName } from './utils'
-import type { Config, Swagger, SwaggerOperation, SwaggerParameter, SwaggerParameterBody, SwaggerResponseContent, SwaggerSchema } from './types'
+import {
+  capitalize,
+  genDescription,
+  genTypeImport,
+  getLastPath,
+  getParametersName,
+  transformKeyName,
+} from './utils'
+import type {
+  Config,
+  Swagger,
+  SwaggerOperation,
+  SwaggerParameter,
+  SwaggerParameterBody,
+  SwaggerResponseContent,
+  SwaggerSchema,
+} from './types'
 
 export function pathsToApis(content: Swagger, config: Config) {
   const apiConfig = Object.assign({}, defaultApi, config.api)
   const [importTypes, api, type] = genPathsContent(content, config)
+  const description = genDescription(config.description, '', '\n\n')
 
   if (api) {
-    const data = `export const ${apiConfig.exportName} = {${api}
+    const data = `${description}export const ${apiConfig.exportName} = {${api}
 } as const
 `
 
@@ -25,7 +41,7 @@ export function pathsToApis(content: Swagger, config: Config) {
       })
     }
 
-    const data = `${imports ? `${imports}\n` : ''}export interface ${apiConfig.typeName} {${type}
+    const data = `${description}${imports ? `${imports}\n` : ''}export interface ${apiConfig.typeName} {${type}
 }
 `
 
@@ -74,14 +90,20 @@ export function genPathsContent(content: Swagger, config: Config): [Set<string>,
   return [importTypes, api, type]
 }
 
-export function genResponsesType(response: SwaggerResponseContent | undefined, config: Config): [Set<string>, string | undefined] {
+export function genResponsesType(
+  response: SwaggerResponseContent | undefined,
+  config: Config,
+): [Set<string>, string | undefined] {
   const schema = response?.content?.['application/json']?.schema || response?.schema
 
   if (!schema) return [new Set<string>(), undefined]
   return genSchema(schema, config)
 }
 
-export function genRequestBodyType(operation: SwaggerOperation, config: Config): [Set<string>, string | undefined] {
+export function genRequestBodyType(
+  operation: SwaggerOperation,
+  config: Config,
+): [Set<string>, string | undefined] {
   const schema = operation.requestBody?.content?.['application/json']?.schema
     || (operation.parameters?.find((item) => item.in === 'body') as SwaggerParameterBody)?.schema
 
@@ -89,7 +111,13 @@ export function genRequestBodyType(operation: SwaggerOperation, config: Config):
   return genSchema(schema, config)
 }
 
-export function genRequestType(name: string, type: Exclude<SwaggerParameter['in'], 'formData'>, parameters: Array<SwaggerParameter | SwaggerParameterBody> | undefined, content: Swagger, config: Config): [Set<string>, string | undefined] {
+export function genRequestType(
+  name: string,
+  type: Exclude<SwaggerParameter['in'], 'formData'>,
+  parameters: Array<SwaggerParameter | SwaggerParameterBody> | undefined,
+  content: Swagger,
+  config: Config,
+): [Set<string>, string | undefined] {
   const list = parameters?.filter((item) => item.in === type)
 
   if (!list?.length) return [new Set<string>(), undefined]
@@ -121,7 +149,7 @@ export function genRequestType(name: string, type: Exclude<SwaggerParameter['in'
 }
 
 export function genApiProp(name: string, path: string, description?: string) {
-  return `${description ? `\n  /** ${description} */` : ''}\n  ${transformKeyName(name)}: '${path}',`
+  return `${genDescription(description)}\n  ${transformKeyName(name)}: '${path}',`
 }
 
 interface ApiTypeProp {
@@ -132,8 +160,12 @@ interface ApiTypeProp {
   body?: string
 }
 
-export function genApiTypeProp(method: string, description: string | undefined, { responses, header, path, query, body }: ApiTypeProp) {
-  return `${description ? `\n    /** ${description} */` : ''}\n    ${method}: {
+export function genApiTypeProp(
+  method: string,
+  description: string | undefined,
+  { responses, header, path, query, body }: ApiTypeProp,
+) {
+  return `${genDescription(description, '\n    ')}\n    ${method}: {
       responses: ${responses}${header ? `\n      header: ${header}` : ''}${path ? `\n      path: ${path}` : ''}${query ? `\n      query: ${query}` : ''}${body ? `\n      body: ${body}` : ''}
     }`
 }

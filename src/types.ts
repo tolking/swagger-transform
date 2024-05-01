@@ -8,6 +8,8 @@ export interface Config {
     typeFileName?: string
     outDir?: string
   },
+  index?: boolean
+  description?: string
   typeMap?: Record<string, string>
   reParametersName?: (
     key: string,
@@ -80,7 +82,12 @@ export interface SwaggerParameterBody {
   schema: SwaggerSchema
 }
 
-export type SwaggerSchema = SwaggerSchemaDefault | SwaggerSchemaRef | SwaggerSchemaArray | SwaggerSchemaObject | SwaggerSchemaEnum
+export type SwaggerSchema =
+  | SwaggerSchemaDefault
+  | SwaggerSchemaRef
+  | SwaggerSchemaArray
+  | SwaggerSchemaObject
+  | SwaggerSchemaEnum
 
 export interface SwaggerSchemaDefault {
   type?: string

@@ -76,8 +76,15 @@ export function getRefTypeName(ref: string, config: Config) {
  * @param content 
  * @param config 
  */
-export function getParametersName(key: string, type: Exclude<SwaggerParameter['in'], 'formData'>, content: Swagger, config: Config) {
-  let name = config.reParametersName ? config.reParametersName(key, 'header', content) : `${capitalize(key)}${capitalize(type)}`
+export function getParametersName(
+  key: string,
+  type: Exclude<SwaggerParameter['in'], 'formData'>,
+  content: Swagger,
+  config: Config,
+) {
+  let name = config.reParametersName
+    ? config.reParametersName(key, 'header', content)
+    : `${capitalize(key)}${capitalize(type)}`
   let n = 0
 
   while (content.definitions && name in content.definitions) {
@@ -98,4 +105,23 @@ export function genTypeImport(key: string, config: Config): string {
   const typeName = config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
 
   return `import type { ${typeName} } from './${fileName}'\n`
+}
+
+/**
+ * Generate type export
+ * @param key string
+ * @param config Config
+ */
+export function genTypeExport(fileName: string): string {
+  return `export type * from './${fileName}'\n`
+}
+
+/**
+ * Generate description
+ * @param description the description string
+ * @param before the string before the description, default: '\n  '
+ * @param after the string after the description, default: ''
+ */
+export function genDescription(description?: string , before = '\n  ', after = '') {
+  return description ? `${before}/** ${description} */${after}` : ''
 }
