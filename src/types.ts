@@ -1,22 +1,81 @@
 export interface Config {
+  /**
+   * The path of the swagger file
+   * 
+   * @required
+   * @example 'path/to/swagger.json'
+   * @example 'https://example.com/swagger.json'
+   */
   entry: string
+  /**
+   * The output directory of the generated type files
+   * 
+   * @default 'types'
+   * @example 'types/models'
+   */
   outDir?: string
-  api?: {
-    fileName?: string
-    exportName?: string
-    typeName?: string
-    typeFileName?: string
-    outDir?: string
-  },
+  /** Whether to generate an index file that exports all type files  */
   index?: boolean
+  /** Add a description at the top of each generated file */
   description?: string
+  /** The type conversion map */
   typeMap?: Record<string, string>
+  /** The configuration of the generated api file and type */
+  api?: {
+    /**
+     * The file name of the generated api file
+     * 
+     * @default 'apis'
+     */
+    fileName?: string
+    /**
+     * The export name of the generated api
+     * 
+     * @default 'Apis'
+     */
+    exportName?: string
+    /**
+     * The output directory of the generated api file
+     * 
+     * @default config.outDir
+     */
+    outDir?: string
+    /**
+     * The file name of the generated api type file
+     * 
+     * @default 'allApis'
+     */
+    typeFileName?: string
+    /**
+     * The type name of the api
+     * 
+     * @default 'AllApis'
+     */
+    typeName?: string
+  },
+  /**
+   * Replace the name of the parameter
+   * 
+   * @param key The name of the parameter
+   * @param type The type of the parameter
+   * @param content The content of the swagger file
+   */
   reParametersName?: (
     key: string,
     type: Exclude<SwaggerParameter['in'], 'formData'>,
     content: Swagger,
   ) => string,
+  /**
+   * Replace the name of the definition
+   * 
+   * @param name The name of the definition
+   */
   reDefinitionName?: (name: string) => string,
+  /**
+   * Replace the file name of the definition
+   * 
+   * @param name The name of the definition
+   */
   reDefinitionFileName?: (name: string) => string,
 }
 

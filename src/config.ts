@@ -1,14 +1,14 @@
 import type { Config } from './types'
 
 export const defaultConfig: Partial<Config> = {
-  outDir: 'swagger',
+  outDir: 'types',
 }
 
 export const defaultApi: Config['api'] = {
   fileName: 'apis',
   exportName: 'Apis',
-  typeName: 'AllApi',
-  typeFileName: 'allApi',
+  typeName: 'AllApis',
+  typeFileName: 'allApis',
 }
 
 export const defaultTypeMap: Config['typeMap'] = {
