@@ -10,6 +10,22 @@ export function isNumber(value: unknown): value is number {
 }
 
 /**
+ * Check the value is object
+ * @param value any
+ */
+export function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null
+}
+
+/**
+ * Check the value is array
+ * @param value any
+ */
+export function isArray(value: unknown): value is unknown[] {
+  return Array.isArray(value)
+}
+
+/**
  * Check the integrity of the url
  * @param url isURL
  */
@@ -31,6 +47,27 @@ export function capitalize<T extends string>(str: T) {
  */
 export function uncapitalize<T extends string>(str: T) {
   return str.replace(/^\w/, (c) => c.toLowerCase()) as Uncapitalize<T>
+}
+
+/**
+ * deep merge object
+ * @param target object
+ * @param source object
+ */
+// eslint-disable-next-line 
+export function deepMerge<T extends Record<string, any>>(target: T, source: T): T {
+  for (const key in source) {
+    if (isArray(source[key])) {
+      if (!target[key]) Object.assign(target, { [key]: [] })
+      target[key] = target[key].concat(source[key])
+    } else if (isObject(source[key])) {
+      if (!target[key]) Object.assign(target, { [key]: {} })
+      deepMerge(target[key], source[key])
+    } else {
+      Object.assign(target, { [key]: source[key] })
+    }
+  }
+  return target
 }
 
 /** 

@@ -5,8 +5,9 @@ export interface Config {
    * @required
    * @example 'path/to/swagger.json'
    * @example 'https://example.com/swagger.json'
+   * @example ['path/to/swagger1.json', 'path/to/swagger2.json']
    */
-  entry: string
+  entry: string | string[]
   /**
    * The output directory of the generated type files
    * 

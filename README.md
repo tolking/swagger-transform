@@ -22,6 +22,8 @@ swaggerToType({
   entry: 'path/to/swagger.json',
   // or
   entry: 'https://example.com/swagger.json'
+  // or
+  entry: ['path/to/swagger1.json', 'path/to/swagger2.json'],
 })
 ```
 
@@ -29,7 +31,7 @@ swaggerToType({
 
 ### entry
 
-- Type: `string`
+- Type: `string` | `Array<string>`
 - Required: `true`
 
 The path to the Swagger/OpenAPI spec file or the URL to the Swagger/OpenAPI spec.

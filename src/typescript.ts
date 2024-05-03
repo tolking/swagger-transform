@@ -2,15 +2,25 @@ import { defaultConfig } from './config'
 import { definitionsToType } from './definitions'
 import { pathsToApis } from './paths'
 import { read } from './read'
-import type { Config } from './types'
+import { deepMerge, isArray } from './utils'
+import type { Config, Swagger } from './types'
 
 export async function swaggerToType(option: Config) {
-  const config = Object.assign({}, defaultConfig, option)
-  if (!config.entry) {
+  if (!option.entry) {
     throw new Error('[swagger-transform Error]: entry is required')
   }
 
-  const content = await read(config.entry)
+  const config = Object.assign({}, defaultConfig, option)
+  let content: Swagger | undefined
+
+  if (isArray(config.entry)) {
+    for (const item of config.entry) {
+      content = deepMerge(content || {} as Swagger, await read(item))
+    }
+  } else {
+    content = await read(config.entry)
+  }
+
   if (!content) return
   config.api && pathsToApis(content, config)
   definitionsToType(content, config)
