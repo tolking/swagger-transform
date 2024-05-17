@@ -73,11 +73,24 @@ export interface Config {
    */
   reDefinitionName?: (name: string) => string,
   /**
+   * Replace the name of the class
+   * 
+   * @param name The name of the definition
+   */
+  reClassName?: (name: string) => string,
+  /**
    * Replace the file name of the definition
    * 
    * @param name The name of the definition
    */
   reDefinitionFileName?: (name: string) => string,
+}
+
+export interface PropItem {
+  key: string
+  type: string
+  required?: boolean
+  description?: string
 }
 
 /** Swagger */
