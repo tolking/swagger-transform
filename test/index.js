@@ -1,6 +1,6 @@
-import { swaggerToType } from '../lib/index.js'
+import { swaggerToClass } from '../lib/index.js'
 
-swaggerToType({
+swaggerToClass({
   entry: './test/swagger.json',
   outDir: './test/types',
   api: {},

@@ -13,6 +13,7 @@ import {
 } from './utils'
 import type {
   Config,
+  PropItem,
   Swagger,
   SwaggerSchema,
   SwaggerSchemaArray,
@@ -32,8 +33,9 @@ export function definitionsToType(content: Swagger, config: Config) {
 
     fileList.push(fileName)
     if ('properties' in item) {
-      const [importTypes, properties] = genInterface(item, config)
+      const [importTypes, properties] = getInterface(item, config)
       let imports = ''
+      let propert = ''
 
       if (importTypes.size) {
         importTypes.forEach((item) => {
@@ -41,7 +43,68 @@ export function definitionsToType(content: Swagger, config: Config) {
         })
       }
 
-      const data = `${description}${imports ? `${imports}\n` : ''}export interface ${typeName} {${properties}
+      properties.forEach((item) => {
+        propert += getInterfaceProp(item, config)
+      })
+
+      const data = `${description}${imports ? `${imports}\n` : ''}export interface ${typeName} {${propert}
+}
+`
+
+      write(config.outDir!, `${fileName}.ts`, data)
+    } else if ('enum' in item) {
+      const data = genEnum(typeName, item)
+
+      write(config.outDir!, `${fileName}.ts`, `${description}${data}`)
+    }
+  }
+
+  if (config.index) {
+    const apiConfig = Object.assign({}, defaultApi, config.api)
+    const data = fileList.reduce((all, item) => {
+      all += genTypeExport(item)
+      return all
+    }, `${description}${apiConfig.typeFileName ? genTypeExport(apiConfig.typeFileName) : ''}`)
+
+    write(config.outDir!, 'index.ts', data)
+  }
+}
+export function definitionsToClass(content: Swagger, config: Config) {
+  const definitions = Object.assign({}, content?.components?.schemas, content?.definitions)
+  const description = genDescription(config.description, '', '\n\n')
+  const fileList: string[] = []
+
+  for (const key in definitions) {
+    const item = definitions[key]
+    const fileName = config.reDefinitionFileName ? config.reDefinitionFileName(key) : uncapitalize(key)
+    const typeName = config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
+    const className = config.reClassName ? config.reClassName(key) : `${capitalize(key)}Class`
+
+    fileList.push(fileName)
+    if ('properties' in item) {
+      const [importTypes, properties] = getInterface(item, config)
+      let imports = ''
+      let propert = ''
+      let constructor = ''
+
+      if (importTypes.size) {
+        importTypes.forEach((item) => {
+          imports += genTypeImport(item, config)
+        })
+      }
+
+      properties.forEach((item) => {
+        propert += getInterfaceProp(item, config)
+        constructor += getConstructorProp(item.key)
+      })
+
+      const data = `${description}${imports ? `${imports}\n` : ''}export interface ${typeName} {${propert}
+}
+
+export class ${className} {${propert}
+
+  constructor(init: ${typeName}) {${constructor}
+  }
 }
 `
 
@@ -64,17 +127,24 @@ export function definitionsToType(content: Swagger, config: Config) {
   }
 }
 
-export function genInterface(definition: SwaggerSchemaObject, config: Config): [Set<string>, string] {
+export function getInterface(definition: SwaggerSchemaObject, config: Config): [Set<string>, PropItem[]] {
   const importTypes = new Set<string>()
-  let properties = ''
+  const properties: PropItem[] = []
 
   for (const key in definition.properties) {
     const schema = definition.properties[key]
-    const [_importTypes, _type] = genSchema(schema, config)
+    const [_importTypes, type] = genSchema(schema, config)
 
-    if (_type) { 
+    if (type) {
+      const required = definition.required && definition.required.includes(key)
+
       _importTypes.forEach((item) => importTypes.add(item))
-      properties += genInterfaceProp(key, _type, definition.required, schema.description, config)
+      properties.push({
+        key,
+        type,
+        required,
+        description: schema.description,
+      })
     }
   }
 
@@ -96,10 +166,15 @@ export function genSchema(schema: SwaggerSchema, config: Config): [Set<string>, 
         importTypes.add(ref)
         return ref
       } else if ('properties' in item) {
-        const [_importTypes, _properties] = genInterface(item, config)
+        const [_importTypes, _properties] = getInterface(item, config)
+        let propert = ''
+
+        _properties.forEach((item) => {
+          propert += getInterfaceProp(item, config)
+        })
 
         _importTypes.forEach((item) => importTypes.add(item))
-        return `{${_properties.replaceAll(/ {2}/g, '    ')}\n  }`
+        return `{${propert.replaceAll(/ {2}/g, '    ')}\n  }`
       }
     }).join(' & ')
 
@@ -120,10 +195,15 @@ export function genSchema(schema: SwaggerSchema, config: Config): [Set<string>, 
       return [importTypes, `${transformType(_schema.items.type, config)}[]`]
     }
   } else if (schema.type && schema.type === 'object') {
-    const [_importTypes, _type] = genInterface(schema as SwaggerSchemaObject, config)
+    const [_importTypes, _properties] = getInterface(schema as SwaggerSchemaObject, config)
+    let propert = ''
+
+    _properties.forEach((item) => {
+      propert += getInterfaceProp(item, config)
+    })
 
     _importTypes.forEach((item) => importTypes.add(item))
-    return [importTypes, `{${_type.replaceAll(/ {2}/g, '    ')}\n  }`]
+    return [importTypes, `{${propert.replaceAll(/ {2}/g, '    ')}\n  }`]
   } else if (schema.type) {
     return [importTypes, schema.type]
   }
@@ -131,15 +211,13 @@ export function genSchema(schema: SwaggerSchema, config: Config): [Set<string>, 
   return [importTypes, undefined]
 }
 
-export function genInterfaceProp(
-  key: string,
-  value: string,
-  required: string[] | undefined,
-  description: string | undefined,
-  config: Config,
-) {
-  const requiredText = required && required.includes(key) ? '' : '?'
-  return `${genDescription(description)}\n  ${transformKeyName(key)}${requiredText}: ${transformType(value, config)}`
+export function getInterfaceProp(item: PropItem, config: Config) {
+  return `${genDescription(item.description)}\n  ${transformKeyName(item.key)}${item.required ? '' : '?'}: ${transformType(item.type, config)}`
+}
+
+export function getConstructorProp(key: string) {
+  const name = /^[a-zA-Z0-9]*$/.test(key) ? `.${key}` : `['${key}']`
+  return `\n    this${name} = init${name}`
 }
 
 export function genEnum(typeName: string, definition: SwaggerSchemaEnum) {

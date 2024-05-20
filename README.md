@@ -16,7 +16,7 @@ npm install swagger-transform
 ## Usage
 
 ```ts
-import { swaggerToType } from 'swagger-transform'
+import { swaggerToType, swaggerToClass } from 'swagger-transform'
 
 swaggerToType({
   entry: 'path/to/swagger.json',
@@ -24,6 +24,11 @@ swaggerToType({
   entry: 'https://example.com/swagger.json'
   // or
   entry: ['path/to/swagger1.json', 'path/to/swagger2.json'],
+})
+
+// or transform to class
+swaggerToClass({
+  entry: 'path/to/swagger.json',
 })
 ```
 
