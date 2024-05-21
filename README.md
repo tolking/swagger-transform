@@ -109,6 +109,13 @@ The configuration of the generated api file and type. If `undefined`, the api fi
 
   The export name of the generated api type file
 
++ api.definitionType
+
+  - Type: `'type' | 'class'`
+  - Default: `'type'`
+
+  The type name of the generated api definition, When using the `swaggerToClass` function, you can configure
+
 ### reParametersName
 
 - Type: `function`
@@ -126,3 +133,9 @@ A function that receives the definition name and returns the new definition name
 - Type: `function`
 
 A function that receives the definition name and returns the new definition file name.
+
+### reClassName
+
+- Type: `function`
+
+A function that receives the class name and returns the new class name.

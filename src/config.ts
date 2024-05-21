@@ -9,6 +9,7 @@ export const defaultApi: Config['api'] = {
   exportName: 'Apis',
   typeName: 'AllApis',
   typeFileName: 'allApis',
+  definitionType: 'type',
 }
 
 export const defaultTypeMap: Config['typeMap'] = {

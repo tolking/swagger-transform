@@ -53,6 +53,12 @@ export interface Config {
      * @default 'AllApis'
      */
     typeName?: string
+    /**
+     * The export name of the api type
+     * 
+     * @default 'type'
+     */
+    definitionType?: 'type' | 'class'
   },
   /**
    * Replace the name of the parameter

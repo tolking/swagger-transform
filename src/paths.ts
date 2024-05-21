@@ -5,6 +5,8 @@ import {
   capitalize,
   genDescription,
   genTypeImport,
+  getClassName,
+  getDefinitionFileName,
   getLastPath,
   getParametersName,
   transformKeyName,
@@ -37,7 +39,11 @@ export function pathsToApis(content: Swagger, config: Config) {
 
     if (importTypes.size) {
       importTypes.forEach((item) => {
-        imports += genTypeImport(item, config)
+        const className = getClassName(item, config)
+        const type = apiConfig.definitionType === 'class' ? className : item
+        const fileName = getDefinitionFileName(item, config)
+
+        imports += genTypeImport(type, fileName)
       })
     }
 
@@ -94,21 +100,23 @@ export function genResponsesType(
   response: SwaggerResponseContent | undefined,
   config: Config,
 ): [Set<string>, string | undefined] {
+  const apiConfig = Object.assign({}, defaultApi, config.api)
   const schema = response?.content?.['application/json']?.schema || response?.schema
 
   if (!schema) return [new Set<string>(), undefined]
-  return genSchema(schema, config)
+  return genSchema(schema, config, apiConfig.definitionType)
 }
 
 export function genRequestBodyType(
   operation: SwaggerOperation,
   config: Config,
 ): [Set<string>, string | undefined] {
+  const apiConfig = Object.assign({}, defaultApi, config.api)
   const schema = operation.requestBody?.content?.['application/json']?.schema
     || (operation.parameters?.find((item) => item.in === 'body') as SwaggerParameterBody)?.schema
 
   if (!schema) return [new Set<string>(), undefined]
-  return genSchema(schema, config)
+  return genSchema(schema, config, apiConfig.definitionType)
 }
 
 export function genRequestType(
@@ -118,10 +126,12 @@ export function genRequestType(
   content: Swagger,
   config: Config,
 ): [Set<string>, string | undefined] {
+  const apiConfig = Object.assign({}, defaultApi, config.api)
   const list = parameters?.filter((item) => item.in === type)
 
   if (!list?.length) return [new Set<string>(), undefined]
   const typeName = getParametersName(name, type, content, config)
+  const className = getClassName(typeName, config)
   const properties: Record<string, SwaggerSchema> = {}
   const required: string[] = []
 
@@ -145,7 +155,7 @@ export function genRequestType(
     properties,
   }
 
-  return [new Set<string>([typeName]), typeName]
+  return [new Set<string>([typeName]), apiConfig.definitionType === 'class' ? className : typeName]
 }
 
 export function genApiProp(name: string, path: string, description?: string) {

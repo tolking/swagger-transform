@@ -97,13 +97,40 @@ export function transformKeyName(name: string) {
 }
 
 /**
+ * Get the name of the definition
+ * @param name string
+ * @param config Config
+ */
+export function getDefinitionName(name: string, config: Config) {
+  return config.reDefinitionName ? config.reDefinitionName(name) : capitalize(name)
+}
+
+/**
+ * Get the name of the class
+ * @param name string
+ * @param config Config
+ */
+export function getClassName(name: string, config: Config) {
+  return config.reClassName ? config.reClassName(name) : `${capitalize(name)}Class`
+}
+
+/**
+ * Get the name of the definition file
+ * @param name string
+ * @param config Config
+ */
+export function getDefinitionFileName(name: string, config: Config) {
+  return config.reDefinitionFileName ? config.reDefinitionFileName(name) : uncapitalize(name)
+}
+
+/**
  * Get the name of the reference type
  * @param ref string
  * @param config Config
  */
 export function getRefTypeName(ref: string, config: Config) {
   const key = getLastPath(ref)
-  return config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
+  return getDefinitionName(key, config)
 }
 
 /**
@@ -133,14 +160,12 @@ export function getParametersName(
 
 /**
  * Generate type import
- * @param key string
+ * @param typeName string
+ * @param fileName string
  * @param config Config
  */
-export function genTypeImport(key: string, config: Config): string {
-  if (!key) return ''
-  const fileName = config.reDefinitionFileName ? config.reDefinitionFileName(key) : uncapitalize(key)
-  const typeName = config.reDefinitionName ? config.reDefinitionName(key) : capitalize(key)
-
+export function genTypeImport(typeName: string, fileName: string): string {
+  if (!typeName || !fileName) return ''
   return `import type { ${typeName} } from './${fileName}'\n`
 }
 
