@@ -116,6 +116,33 @@ The configuration of the generated api file and type. If `undefined`, the api fi
 
   The type name of the generated api definition, When using the `swaggerToClass` function, you can configure
 
++ api.function
+
+  - Type: `boolean`
+  - Default: `false`
+
+  Whether to generate the api function file, You need to improve the encapsulation of the request function yourself
+
++ api.functionFileName
+
+  - Type: `string`
+  - Default: `'repository'`
+
+  The file name of the generated api function file
+
++ api.functionImport
+
+  - Type: `string`
+  - Default: `import request from \'./request\'`
+
+  The import statement of the generated api function file
+
++ api.reFunctionTemplate
+
+  -Type: `function`
+
+  A function that replace the api function
+
 ### reParametersName
 
 - Type: `function`

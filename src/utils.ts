@@ -161,21 +161,20 @@ export function getParametersName(
 /**
  * Generate type import
  * @param typeName string
- * @param fileName string
- * @param config Config
+ * @param filePath string
+ * @param type boolean
  */
-export function genTypeImport(typeName: string, fileName: string): string {
-  if (!typeName || !fileName) return ''
-  return `import type { ${typeName} } from './${fileName}'\n`
+export function genTypeImport(typeName: string, filePath: string, type = true): string {
+  if (!typeName || !filePath) return ''
+  return `import ${type ? 'type ' : ''}{ ${typeName} } from '${filePath}'\n`
 }
 
 /**
  * Generate type export
  * @param key string
- * @param config Config
  */
-export function genTypeExport(fileName: string): string {
-  return `export type * from './${fileName}'\n`
+export function genTypeExport(filePath: string): string {
+  return `export * from './${filePath}'\n`
 }
 
 /**

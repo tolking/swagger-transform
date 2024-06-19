@@ -59,6 +59,43 @@ export interface Config {
      * @default 'type'
      */
     definitionType?: 'type' | 'class'
+    /**
+     * Whether to generate the api function file, You need to improve the encapsulation of the request function yourself
+     * 
+     * @default false
+     */
+    function?: boolean
+    /**
+     * The file name of the generated api function file
+     * 
+     * @default 'repository'
+     */
+    functionFileName?: string
+    /**
+     * The import statement of the generated api function file
+     * 
+     * @example 'import request from \'./request\''
+     */
+    functionImport?: string
+    /**
+     * Replace the api function
+     * @param name The name of the definition
+     * @param method The method of the api
+     * @param description The description of the api
+     * @param payload The payload type of the api (qurery or body)
+     * @param path The path type of the api
+     * @param header The header type of the api
+     * @param responses The responses type of the api
+     */
+    reFunctionTemplate?: (
+      name: string,
+      method: string,
+      description: string | undefined,
+      payload: string | undefined,
+      path: string | undefined,
+      header: string | undefined,
+      responses: string | undefined,
+    ) => string
   },
   /**
    * Replace the name of the parameter

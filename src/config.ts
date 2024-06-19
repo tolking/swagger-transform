@@ -10,6 +10,8 @@ export const defaultApi: Config['api'] = {
   typeName: 'AllApis',
   typeFileName: 'allApis',
   definitionType: 'type',
+  functionFileName: 'repository',
+  functionImport: 'import request from \'./request\'',
 }
 
 export const defaultTypeMap: Config['typeMap'] = {
