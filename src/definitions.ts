@@ -41,7 +41,7 @@ export function definitionsToType(content: Swagger, config: Config) {
       if (importTypes.size) {
         importTypes.forEach((item) => {
           const fileName = getDefinitionFileName(item, config)
-          imports += genTypeImport(item, fileName)
+          imports += genTypeImport(item, `./${fileName}`)
         })
       }
 
@@ -93,7 +93,7 @@ export function definitionsToClass(content: Swagger, config: Config) {
         importTypes.forEach((item) => {
           const className = getClassName(item, config)
           const fileName = getDefinitionFileName(item, config)
-          imports += genTypeImport(className, fileName)
+          imports += genTypeImport(className, `./${fileName}`)
         })
       }
 
@@ -211,7 +211,7 @@ export function genSchema(schema: SwaggerSchema, config: Config, definitionType?
     })
 
     _importTypes.forEach((item) => importTypes.add(item))
-    return [importTypes, `{${propert.replaceAll(/ {2}/g, '    ')}\n  }`]
+    return [importTypes, propert ? `{${propert.replaceAll(/ {2}/g, '    ')}\n  }` : 'object']
   } else if (schema.type) {
     return [importTypes, transformType(schema.type, config)]
   }

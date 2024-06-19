@@ -1,5 +1,7 @@
 export * from './class'
+export * from './config'
 export * from './definitions'
+export * from './paths'
 export * from './read'
 export * from './typescript'
 export * from './types'

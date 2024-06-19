@@ -1,3 +1,4 @@
+import { relative, resolve } from 'path'
 import { defaultApi } from './config'
 import { genSchema } from './definitions'
 import { write } from './write'
@@ -10,6 +11,7 @@ import {
   getLastPath,
   getParametersName,
   transformKeyName,
+  uncapitalize,
 } from './utils'
 import type {
   Config,
@@ -23,15 +25,38 @@ import type {
 
 export function pathsToApis(content: Swagger, config: Config) {
   const apiConfig = Object.assign({}, defaultApi, config.api)
-  const [importTypes, api, type] = genPathsContent(content, config)
+  const [importTypes, api, type, functions] = genPathsContent(content, config)
   const description = genDescription(config.description, '', '\n\n')
-
+  
   if (api) {
     const data = `${description}export const ${apiConfig.exportName} = {${api}
 } as const
 `
 
     write(apiConfig.outDir ?? config.outDir!, `${apiConfig.fileName}.ts`, data)
+  }
+
+  if (apiConfig.function && functions) {
+    let imports = ''
+
+    if (importTypes.size) {
+      importTypes.forEach((item) => {
+        const className = getClassName(item, config)
+        const type = apiConfig.definitionType === 'class' ? className : item
+        const fileName = getDefinitionFileName(item, config)
+        const outDir = resolve(config.outDir!)
+        const apiOutDir = apiConfig.outDir ? resolve(apiConfig.outDir) : outDir
+        const path = relative(apiOutDir, outDir)
+
+        imports += genTypeImport(type, `${path || '.'}/${fileName}`, apiConfig.definitionType === 'type')
+      })
+    }
+
+    const data = `${description}${apiConfig.functionImport}
+import { ${apiConfig.exportName} } from './${apiConfig.fileName}'
+${imports ? `${imports}` : ''}${functions}`
+
+    write(apiConfig.outDir ?? config.outDir!, `${apiConfig.functionFileName}.ts`, data)
   }
 
   if (type) {
@@ -43,7 +68,7 @@ export function pathsToApis(content: Swagger, config: Config) {
         const type = apiConfig.definitionType === 'class' ? className : item
         const fileName = getDefinitionFileName(item, config)
 
-        imports += genTypeImport(type, fileName)
+        imports += genTypeImport(type, `./${fileName}`)
       })
     }
 
@@ -55,10 +80,11 @@ export function pathsToApis(content: Swagger, config: Config) {
   }
 }
 
-export function genPathsContent(content: Swagger, config: Config): [Set<string>, string, string] {
+export function genPathsContent(content: Swagger, config: Config): [Set<string>, string, string, string] {
   const importTypes = new Set<string>()
   let api = ''
   let type = ''
+  let functions = ''
 
   for (const path in content.paths) {
     const pathItem = content.paths[path]
@@ -87,13 +113,23 @@ export function genPathsContent(content: Swagger, config: Config): [Set<string>,
         path: pathType,
         query,
       })
+      functions += genApiFunction(
+        name,
+        method,
+        operation.summary || operation.description,
+        ['post', 'put'].includes(method) ? body || (isFormData ? 'FormData' : undefined) : query,
+        pathType,
+        header,
+        responses,
+        config,
+      )
     }
 
     type += `\n  ${transformKeyName(path)}: {${_type}
   }`
   }
 
-  return [importTypes, api, type]
+  return [importTypes, api, type, functions]
 }
 
 export function genResponsesType(
@@ -178,4 +214,27 @@ export function genApiTypeProp(
   return `${genDescription(description, '\n    ')}\n    ${method}: {
       responses: ${responses}${header ? `\n      header: ${header}` : ''}${path ? `\n      path: ${path}` : ''}${query ? `\n      query: ${query}` : ''}${body ? `\n      body: ${body}` : ''}
     }`
+}
+
+export function genApiFunction(
+  name: string,
+  method: string,
+  description: string | undefined,
+  payload: string | undefined,
+  path: string | undefined,
+  header: string | undefined,
+  responses: string | undefined,
+  config: Config,
+) {
+  const apiConfig = Object.assign({}, defaultApi, config.api)
+  
+  if (apiConfig.reFunctionTemplate) {
+    return apiConfig.reFunctionTemplate(name, method, description, payload, path, header, responses)
+  }
+
+  return `${genDescription(description, '\n')}
+export async function ${uncapitalize(name)}(payload: ${payload ?? 'undefined'}, path: ${path ?? 'undefined'}, config?: Record<string, unknown>${header ? ` & { header: ${header} }` : ''}): Promise<${responses ?? 'void'} | null> {
+  return request('${method}', ${apiConfig.exportName}.${name}, payload, path, config)
+}
+`
 }
