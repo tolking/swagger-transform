@@ -22,6 +22,6 @@ export async function swaggerToType(option: Config) {
   }
 
   if (!content) return
-  config.api && pathsToApis(content, config)
+  option.api && pathsToApis(content, config)
   definitionsToType(content, config)
 }

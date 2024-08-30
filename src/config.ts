@@ -16,4 +16,17 @@ export const defaultApi: Config['api'] = {
 
 export const defaultTypeMap: Config['typeMap'] = {
   integer: 'number',
+  int: 'number',
+  long: 'number',
+  float: 'number',
+  double: 'number',
+  int32: 'number',
+  int64: 'number',
+  object: 'Record<string, any>',
 }
+
+export const ignoreLint = '// eslint-disable-next-line @typescript-eslint/no-explicit-any'
+
+export const emptyPropert = `
+  ${ignoreLint}
+  [key: string]: any`

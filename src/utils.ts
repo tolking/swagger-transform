@@ -1,5 +1,13 @@
-import { defaultTypeMap } from './config'
+import { defaultApi, defaultTypeMap } from './config'
 import type { Config, Swagger, SwaggerParameter } from './types'
+
+/**
+ * Get the api config
+ * @param config Config
+ */
+export function getApiConfig(config: Config) {
+  return config.api ? Object.assign({}, defaultApi, config.api) : {}
+}
 
 /**
  * Check the value is number

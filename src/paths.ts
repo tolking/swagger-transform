@@ -1,11 +1,11 @@
 import { relative, resolve } from 'path'
-import { defaultApi } from './config'
 import { genSchema } from './definitions'
 import { write } from './write'
 import {
   capitalize,
   genDescription,
   genTypeImport,
+  getApiConfig,
   getClassName,
   getDefinitionFileName,
   getLastPath,
@@ -24,7 +24,7 @@ import type {
 } from './types'
 
 export function pathsToApis(content: Swagger, config: Config) {
-  const apiConfig = Object.assign({}, defaultApi, config.api)
+  const apiConfig = getApiConfig(config)
   const [importTypes, api, type, functions] = genPathsContent(content, config)
   const description = genDescription(config.description, '', '\n\n')
   
@@ -136,7 +136,7 @@ export function genResponsesType(
   response: SwaggerResponseContent | undefined,
   config: Config,
 ): [Set<string>, string | undefined] {
-  const apiConfig = Object.assign({}, defaultApi, config.api)
+  const apiConfig = getApiConfig(config)
   const schema = response?.content?.['application/json']?.schema || response?.schema
 
   if (!schema) return [new Set<string>(), undefined]
@@ -147,7 +147,7 @@ export function genRequestBodyType(
   operation: SwaggerOperation,
   config: Config,
 ): [Set<string>, string | undefined] {
-  const apiConfig = Object.assign({}, defaultApi, config.api)
+  const apiConfig = getApiConfig(config)
   const schema = operation.requestBody?.content?.['application/json']?.schema
     || (operation.parameters?.find((item) => item.in === 'body') as SwaggerParameterBody)?.schema
 
@@ -162,7 +162,7 @@ export function genRequestType(
   content: Swagger,
   config: Config,
 ): [Set<string>, string | undefined] {
-  const apiConfig = Object.assign({}, defaultApi, config.api)
+  const apiConfig = getApiConfig(config)
   const list = parameters?.filter((item) => item.in === type)
 
   if (!list?.length) return [new Set<string>(), undefined]
@@ -226,7 +226,7 @@ export function genApiFunction(
   responses: string | undefined,
   config: Config,
 ) {
-  const apiConfig = Object.assign({}, defaultApi, config.api)
+  const apiConfig = getApiConfig(config)
   
   if (apiConfig.reFunctionTemplate) {
     return apiConfig.reFunctionTemplate(name, method, description, payload, path, header, responses)

@@ -210,6 +210,7 @@ export interface SwaggerSchemaDefault {
   description?: string
   format?: string
   allOf?: SwaggerSchema[]
+  additionalProperties?: SwaggerSchemaRef
 }
 
 export interface SwaggerSchemaRef {
@@ -231,6 +232,7 @@ export interface SwaggerSchemaObject {
   properties: Record<string, SwaggerSchema>
   required?: string[]
   description?: undefined
+  additionalProperties?: SwaggerSchemaRef
 }
 
 export interface SwaggerSchemaEnum {

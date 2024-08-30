@@ -18,6 +18,6 @@ export async function getContentFromUrl(url: string) {
   .then(response => response.json())
   .then(data => data as Swagger)
   .catch((err) => {
-    throw new Error(`[swagger-transform Error]: ${err}`)
+    throw err
   })
 }
