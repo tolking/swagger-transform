@@ -258,10 +258,6 @@ export function genEnum(typeName: string, definition: SwaggerSchemaEnum, config:
   
 export type ${getClassName(typeName, config)} = ${typeName}` : ''
 
-if (typeName === 'PersonAuthStatus') {
-  console.log('definition', definition['x-enum-varnames'])
-}
-
   if ('x-enum-varnames' in definition && definition['x-enum-varnames']?.length) {
     const data = definition['x-enum-varnames'].reduce((all, item, index) => {
       const description = definition['x-enum-comments']?.[item] || undefined
