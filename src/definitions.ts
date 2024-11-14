@@ -217,16 +217,10 @@ export function genSchema(schema: SwaggerSchema, config: Config, definitionType?
     return [importTypes, type]
   } else if ((schema.type && schema.type === 'array') || ('items' in schema && schema.items)) {
     const _schema = schema as SwaggerSchemaArray
+    const [imports, name] = genSchema(_schema.items, config, definitionType)
 
-    if ('$ref' in _schema.items && _schema.items.$ref) {
-      const type = getRefTypeName(_schema.items.$ref, config)
-      const className = getClassName(type, config)
-
-      importTypes.add(type)
-      return [importTypes, `${definitionType === 'class'? className : type}[]`]
-    } else if (_schema.items.type) {
-      return [importTypes, `${transformType(_schema.items.type, config)}[]`]
-    }
+    imports.forEach((item) => importTypes.add(item))
+    return [importTypes, `${name}[]`]
   } else if (schema.type && schema.type === 'object' && schema.additionalProperties?.$ref) {
     const type = getRefTypeName(schema.additionalProperties.$ref, config)
     const className = getClassName(type, config)
@@ -263,6 +257,10 @@ export function genEnum(typeName: string, definition: SwaggerSchemaEnum, config:
   const append = definitionType === 'class' ? `
   
 export type ${getClassName(typeName, config)} = ${typeName}` : ''
+
+if (typeName === 'PersonAuthStatus') {
+  console.log('definition', definition['x-enum-varnames'])
+}
 
   if ('x-enum-varnames' in definition && definition['x-enum-varnames']?.length) {
     const data = definition['x-enum-varnames'].reduce((all, item, index) => {
