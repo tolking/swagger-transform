@@ -232,7 +232,7 @@ export interface SwaggerSchemaObject {
   properties: Record<string, SwaggerSchema>
   required?: string[]
   description?: undefined
-  additionalProperties?: SwaggerSchemaRef
+  additionalProperties?: SwaggerSchema
 }
 
 export interface SwaggerSchemaEnum {

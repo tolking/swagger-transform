@@ -221,12 +221,11 @@ export function genSchema(schema: SwaggerSchema, config: Config, definitionType?
 
     imports.forEach((item) => importTypes.add(item))
     return [importTypes, `${name}[]`]
-  } else if (schema.type && schema.type === 'object' && schema.additionalProperties?.$ref) {
-    const type = getRefTypeName(schema.additionalProperties.$ref, config)
-    const className = getClassName(type, config)
+  } else if (schema.type && schema.type === 'object' && schema.additionalProperties) {
+    const [imports, name] = genSchema(schema.additionalProperties, config, definitionType)
 
-    importTypes.add(type)
-    return [importTypes, `Record<string, ${definitionType === 'class'? className : type}>`]
+    imports.forEach((item) => importTypes.add(item))
+    return [importTypes, `Record<string, ${name}>`]
   } else if (schema.type && schema.type === 'object') {
     const [_importTypes, _properties] = getInterface(schema as SwaggerSchemaObject, config, definitionType)
     let propert = ''
