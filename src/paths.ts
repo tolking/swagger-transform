@@ -176,10 +176,7 @@ export function genRequestType(
     if (item.required) {
       required.push(item.name)
     }
-    properties[item.name] = {
-      ...item,
-      ...item.schema,
-    }
+    properties[item.name] = Object.assign({}, item, item.schema)
   }
 
   if (!content.definitions) {

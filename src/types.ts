@@ -210,7 +210,7 @@ export interface SwaggerSchemaDefault {
   description?: string
   format?: string
   allOf?: SwaggerSchema[]
-  additionalProperties?: SwaggerSchemaRef
+  additionalProperties?: SwaggerSchemaRef | true
 }
 
 export interface SwaggerSchemaRef {

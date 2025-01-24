@@ -10,6 +10,7 @@ import {
   getDefinitionName,
   getRefTypeName,
   isNumber,
+  isObject,
   transformKeyName,
   transformType,
 } from './utils'
@@ -221,7 +222,7 @@ export function genSchema(schema: SwaggerSchema, config: Config, definitionType?
 
     imports.forEach((item) => importTypes.add(item))
     return [importTypes, `${name}[]`]
-  } else if (schema.type && schema.type === 'object' && schema.additionalProperties) {
+  } else if (schema.type && schema.type === 'object' && isObject(schema.additionalProperties)) {
     const [imports, name] = genSchema(schema.additionalProperties, config, definitionType)
 
     imports.forEach((item) => importTypes.add(item))
