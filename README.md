@@ -21,6 +21,8 @@ import { swaggerToType, swaggerToClass } from 'swagger-transform'
 swaggerToType({
   entry: 'path/to/swagger.json',
   // or
+  entry: 'path/to/openapi.yaml',
+  // or
   entry: 'https://example.com/swagger.json'
   // or
   entry: ['path/to/swagger1.json', 'path/to/swagger2.json'],
@@ -166,3 +168,9 @@ A function that receives the definition name and returns the new definition file
 - Type: `function`
 
 A function that receives the class name and returns the new class name.
+
+### beforeParse
+
+- Type: `function`
+
+A function that replace the content of the swagger file before parsing.

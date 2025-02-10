@@ -127,6 +127,12 @@ export interface Config {
    * @param name The name of the definition
    */
   reDefinitionFileName?: (name: string) => string,
+  /**
+   * Replace the content of the swagger file before parsing
+   * 
+   * @param content The content of the swagger file
+   */
+  beforeParse?: (content: string) => string,
 }
 
 export interface PropItem {

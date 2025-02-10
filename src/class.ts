@@ -15,10 +15,10 @@ export async function swaggerToClass(option: Config) {
 
   if (isArray(config.entry)) {
     for (const item of config.entry) {
-      content = deepMerge(content || {} as Swagger, await read(item))
+      content = deepMerge(content || {} as Swagger, await read(item, option))
     }
   } else {
-    content = await read(config.entry)
+    content = await read(config.entry, option)
   }
 
   if (!content) return
