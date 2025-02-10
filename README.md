@@ -4,7 +4,7 @@ A tool to generate API clients from Swagger/OpenAPI specs.
 
 ## Tips
 
-- Only support the `json` format of the Swagger/OpenAPI spec.
+- Only support the `json` and `yaml` format of the Swagger/OpenAPI spec.
 - Partial content conversion may not be supported in some cases.
 
 ## Installation

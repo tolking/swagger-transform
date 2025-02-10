@@ -88,6 +88,15 @@ export function getLastPath(path: string): string {
 }
 
 /**
+ * Get the file type
+ * @param path string
+ */
+export function getFileType(path: string): string {
+  const math = path.match(/\.([^.]+)$/)
+  return math?.[1] || ''
+}
+
+/**
  * transform swagger type
  * @param type string
  */
