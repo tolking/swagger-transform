@@ -272,6 +272,6 @@ export type ${getClassName(typeName, config)} = ${typeName}` : ''
 }${append}
 `
   } else {
-    return `export type ${typeName} = ${definition.enum.map((item) => `'${item}'`).join(' | ')}${append}`
+    return `export type ${typeName} = ${definition.enum.map((item) => isNumber(item) ? item : `'${item}'`).join(' | ')}${append}`
   }
 }
