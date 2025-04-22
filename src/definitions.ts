@@ -241,11 +241,11 @@ export function genSchema(schema: SwaggerSchema, config: Config, definitionType?
     return [importTypes, transformType(schema.type, config)]
   }
 
-  return [importTypes, undefined]
+  return [importTypes, 'any']
 }
 
 export function getInterfaceProp(item: PropItem, config: Config) {
-  return `${genDescription(item.description)}\n  ${item.type === 'object' ? `${ignoreLint}\n  ` : ''}${transformKeyName(item.key)}${item.required ? '' : '?'}: ${transformType(item.type, config)}`
+  return `${genDescription(item.description)}\n  ${['object', 'any'].includes(item.type) ? `${ignoreLint}\n  ` : ''}${transformKeyName(item.key)}${item.required ? '' : '?'}: ${transformType(item.type, config)}`
 }
 
 export function getConstructorProp(key: string) {
