@@ -245,7 +245,7 @@ export function genSchema(schema: SwaggerSchema, config: Config, definitionType?
 }
 
 export function getInterfaceProp(item: PropItem, config: Config) {
-  return `${genDescription(item.description)}\n  ${['object', 'any'].includes(item.type) ? `${ignoreLint}\n  ` : ''}${transformKeyName(item.key)}${item.required ? '' : '?'}: ${transformType(item.type, config)}`
+  return `${genDescription(item.description)}\n  ${/\b(object|any)\b/.test(item.type) ? `${ignoreLint}\n  ` : ''}${transformKeyName(item.key)}${item.required ? '' : '?'}: ${transformType(item.type, config)}`
 }
 
 export function getConstructorProp(key: string) {
