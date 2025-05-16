@@ -67,7 +67,27 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: T): 
   for (const key in source) {
     if (isArray(source[key])) {
       if (!target[key]) Object.assign(target, { [key]: [] })
-      target[key] = target[key].concat(source[key])
+      const targetArr = target[key]
+      const sourceArr = source[key]
+      const maxLength = Math.max(targetArr.length, sourceArr.length)
+      const mergedArr = [] as T[Extract<keyof T, string>]
+
+      for (let i = 0; i < maxLength; i++) {
+        if (i in targetArr && i in sourceArr) {
+          if (JSON.stringify(targetArr[i]) === JSON.stringify(sourceArr[i])) {
+            mergedArr[i] = targetArr[i]
+          } else if (isObject(targetArr[i]) && isObject(sourceArr[i])) {
+            mergedArr[i] = deepMerge({ ...targetArr[i] }, sourceArr[i])
+          } else {
+            mergedArr[i] = sourceArr[i]
+          }
+        } else if (i in sourceArr) {
+          mergedArr[i] = sourceArr[i]
+        } else if (i in targetArr) {
+          mergedArr[i] = targetArr[i]
+        }
+      }
+      target[key] = mergedArr
     } else if (isObject(source[key])) {
       if (!target[key]) Object.assign(target, { [key]: {} })
       deepMerge(target[key], source[key])
