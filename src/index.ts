@@ -1,5 +1,6 @@
 export * from './class'
 export * from './config'
+export * from './content'
 export * from './definitions'
 export * from './paths'
 export * from './read'

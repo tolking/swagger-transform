@@ -34,6 +34,6 @@ export function parseSwagger(path: string, str: string, config: Config) {
     case 'yml':
       return load(content) as Swagger
     default:
-      throw new Error('The file type is not supported')
+      throw new Error('[swagger-transform Error]: The file type is not supported')
   }
 }
