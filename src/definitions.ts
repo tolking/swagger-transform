@@ -60,10 +60,29 @@ export function definitionsToType(content: Swagger, config: Config) {
     } else if ('enum' in item) {
       const data = genEnum(typeName, item, config)
 
-      write(config.outDir!, `${fileName}.ts`, `${description}${data}`)
+      write(config.outDir!, `${fileName}.ts`, `${description}${data}\n`)
     } else if (item.type === 'object') {
       const data = `${description}${ignoreLint}
-export type ${typeName} = Record<string, any>`
+export type ${typeName} = Record<string, any>\n`
+
+      write(config.outDir!, `${fileName}.ts`, data)
+    } else if (item.type === 'array' && 'items' in item && item.items) {
+      const [_importTypes, type] = genSchema(item.items, config)
+
+      let imports = ''
+      if (_importTypes.size) {
+        _importTypes.forEach((item) => {
+          if (item === typeName) return
+          const fileName = getDefinitionFileName(item, config)
+          imports += genTypeImport(item, `./${fileName}`)
+        })
+      }
+
+      const data = `${description}${imports ? `${imports}\n` : ''}export type ${typeName} = ${type}[]\n`
+
+      write(config.outDir!, `${fileName}.ts`, data)
+    } else {
+      const data = `${description}export type ${typeName} = any\n`
 
       write(config.outDir!, `${fileName}.ts`, data)
     }
